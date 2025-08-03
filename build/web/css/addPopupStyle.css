@@ -1,0 +1,115 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jul 24, 2025, 5:30:46 AM
+    Author     : kajani.k
+*/
+
+ body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f0f0f0;
+    }
+    
+     .container {
+      width: 90%;
+      max-width: 600px;
+      margin: 30px 30px;
+      background-color: white;
+      border-radius: 12px;
+      /*margin-top: 20px;*/
+    }
+    
+    .add-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .add-right {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Pushes bottom content (actions) down */
+    }
+    
+    .add-group{
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        margin-bottom: 20px;
+    }
+    
+    .add-group input,
+    .add-group textarea,
+    .add-group select{
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .full-width {
+        grid-column: span 2;
+        margin-top: -20px;
+    }
+    
+    .add-group input:focus {
+        border-color: #008080;
+        box-shadow: 0 0 1px rgba(0, 128, 128, 0.3);
+
+    }
+    
+    .add-group textarea:focus {
+        border-color: #008080;
+        box-shadow: 0 0 1px rgba(0, 128, 128, 0.3);
+
+    }
+    
+    .add-group select:focus {
+        border-color: #008080;
+        box-shadow: 0 0 1px rgba(0, 128, 128, 0.3);
+    }
+    
+    
+    
+    .add-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+        /*padding-right: 20px;*/
+    }
+
+    .btn-save, .btn-cancel {
+        padding: 8px 30px;
+        font-size: 14px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .btn-save {
+        background-color: #008080;
+        color: white;
+    }
+
+    .btn-save:hover {
+        background-color: #006666;
+    }
+
+    .btn-cancel {
+        background-color: white;
+        border: 1px solid #E9173D;
+        color: #E9173D;
+    }
+
+    .btn-cancel:hover {
+        background-color: #E9173D;
+        color: white;
+    }
+
