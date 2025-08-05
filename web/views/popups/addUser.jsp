@@ -73,9 +73,7 @@
                             <select id="role" name="role" required>
                                 <option value="">-- Select --</option>
                                 <option value="admin" <%= "admin".equals(role) ? "selected" : "" %>>Admin</option>
-<!--                                <option value="manager" <%= "admin".equals(role) ? "selected" : "" %>>Manager</option>
-                                <option value="cashier" <%= "admin".equals(role) ? "selected" : "" %>>Cashier</option>-->
-                                <option value="staff" <%= "admin".equals(role) ? "selected" : "" %>>Staff</option>
+                                <option value="staff" <%= "staff".equals(role) ? "selected" : "" %>>Staff</option>
                             </select>
                         </div>                       
                     </div>                     

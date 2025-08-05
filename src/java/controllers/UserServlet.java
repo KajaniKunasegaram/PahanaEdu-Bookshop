@@ -51,9 +51,35 @@ public class UserServlet extends HttpServlet {
         }
         else
         {
-            List<UserModel> userList= getAllUsers();
-            request.setAttribute("users", userList);
+            String search = request.getParameter("search");
+            if (search != null && !search.trim().isEmpty()) {
+                List<UserModel> searchResults = searchUsers(search.trim());
+                request.setAttribute("users", searchResults);
+                request.setAttribute("totalUsers", searchResults.size());
+                request.setAttribute("currentPage", 1);
+                request.setAttribute("totalPages", 1);
+            } else {
+                int page = 1;
+                int recordsPerPage = 10;
+
+                if (request.getParameter("page") != null) {
+                    page = Integer.parseInt(request.getParameter("page"));
+                }
+
+                List<UserModel> userList = getAllUsers((page - 1) * recordsPerPage, recordsPerPage);
+                int totalUsers = getUserCount();
+                int totalPages = (int) Math.ceil(totalUsers * 1.0 / recordsPerPage);
+
+                request.setAttribute("users", userList);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("totalUsers", totalUsers);
+            }
+
             request.getRequestDispatcher("/views/users.jsp").forward(request, response);
+//            List<UserModel> userList= getAllUsers();
+//            request.setAttribute("users", userList);
+//            request.getRequestDispatcher("/views/users.jsp").forward(request, response);
         }
     }
     
@@ -76,8 +102,6 @@ public class UserServlet extends HttpServlet {
             pst.setString(7, request.getParameter("address"));
             
             int rowInserted = pst.executeUpdate();
-            
-//            System.out.println("rowInserted = " + rowInserted);
 
             if (rowInserted > 0) {
                 response.setContentType("text/html");
@@ -134,12 +158,23 @@ public class UserServlet extends HttpServlet {
             pst.setInt(8, Integer.parseInt(request.getParameter("id")));
             
             int success = pst.executeUpdate();
-            if(success>0)
-            {
-//                 PrintWriter out = response.getWriter();
-//                out.println("<script>");
-//                out.println("window.parent.location.reload();");
-//                out.println("alert('✅ User added successfully');");
+            if (success > 0) {
+                response.setContentType("text/html");
+                PrintWriter out = response.getWriter();
+                out.println("<script>");
+                out.println("window.parent.location.reload();");
+                out.println("alert('✅ User updated successfully!');");
+
+                out.println("window.parent.closeAddUserPopup();");
+                out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
+                out.println("</script>");
+            } else {
+                response.setContentType("text/html");
+                PrintWriter out = response.getWriter();
+                out.println("<script>");
+                out.println("alert('❌ Failed to update user');");
+                out.println("window.history.back();");
+                out.println("</script>");
             }
         }
         catch(Exception ex)
@@ -187,21 +222,55 @@ public class UserServlet extends HttpServlet {
     
     
     
-    private List<UserModel> getAllUsers()
-    {
+//    private List<UserModel> getAllUsers()
+//    {
+//        List<UserModel> Users = new ArrayList<>();
+//        
+//        try
+//        {
+//            Connection connection = DBConnection.getConnection();
+//            String query = "select * from tbluser";
+//            
+//            PreparedStatement pst = connection.prepareStatement(query);
+//            ResultSet result = pst.executeQuery();
+//            while(result.next())
+//            {
+//                UserModel user= new UserModel();
+//                
+//                user.setId(result.getInt("id"));
+//                user.setUsername(result.getString("username"));
+//                user.setPassword(result.getString("password"));
+//                user.setPhone(result.getString("phone"));
+//                user.setMail(result.getString("email"));
+//                user.setStatus(result.getString("status"));
+//                user.setRole(result.getString("role"));
+//                user.setAddress(result.getString("address"));
+//                
+//                Users.add(user);
+//            }
+//        }
+//        catch(Exception ex)
+//        {
+//            ex.getStackTrace();
+//        }
+//        return Users;
+//    }
+//    
+//    
+    
+    private List<UserModel> getAllUsers(int offset, int noOfRecords) {
         List<UserModel> Users = new ArrayList<>();
-        
-        try
-        {
+
+        try {
             Connection connection = DBConnection.getConnection();
-            String query = "select * from tbluser";
-            
+            String query = "SELECT * FROM tbluser LIMIT ?, ?";
             PreparedStatement pst = connection.prepareStatement(query);
+            pst.setInt(1, offset);
+            pst.setInt(2, noOfRecords);
             ResultSet result = pst.executeQuery();
-            while(result.next())
-            {
-                UserModel user= new UserModel();
-                
+
+            while (result.next()) {
+                UserModel user = new UserModel();
                 user.setId(result.getInt("id"));
                 user.setUsername(result.getString("username"));
                 user.setPassword(result.getString("password"));
@@ -210,17 +279,66 @@ public class UserServlet extends HttpServlet {
                 user.setStatus(result.getString("status"));
                 user.setRole(result.getString("role"));
                 user.setAddress(result.getString("address"));
-                
                 Users.add(user);
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        catch(Exception ex)
-        {
-            ex.getStackTrace();
-        }
+
         return Users;
     }
+
     
+    private int getUserCount() {
+        int count = 0;
+        try {
+            Connection connection = DBConnection.getConnection();
+            String query = "SELECT COUNT(*) FROM tbluser";
+            PreparedStatement pst = connection.prepareStatement(query);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
     
-    
+    private List<UserModel> searchUsers(String keyword) {
+    List<UserModel> Users = new ArrayList<>();
+
+        try {
+            Connection connection = DBConnection.getConnection();
+            String query = "SELECT * FROM tbluser WHERE username LIKE "
+                    + "? OR phone LIKE ? OR email LIKE ? OR role LIKE ? OR address LIKE ? OR status LIKE ?";
+            PreparedStatement pst = connection.prepareStatement(query);
+            String searchValue = "%" + keyword + "%";
+            pst.setString(1, searchValue);
+            pst.setString(2, searchValue);
+            pst.setString(3, searchValue);
+            pst.setString(4, searchValue);
+            pst.setString(5, searchValue);
+            pst.setString(6, searchValue);
+            
+            ResultSet result = pst.executeQuery();
+            while (result.next()) {
+                UserModel user = new UserModel();
+                user.setId(result.getInt("id"));
+                user.setUsername(result.getString("username"));
+                user.setPassword(result.getString("password"));
+                user.setPhone(result.getString("phone"));
+                user.setMail(result.getString("email"));
+                user.setStatus(result.getString("status"));
+                user.setRole(result.getString("role"));
+                user.setAddress(result.getString("address"));
+                Users.add(user);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return Users;
+    }
+
 }

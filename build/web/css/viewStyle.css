@@ -62,7 +62,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
     tbody {
       display: block;
-      max-height: 300px; /* Adjust as needed */
       overflow-y: auto;
       width: 100%;
     }
@@ -110,3 +109,56 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
       background-color: #dc3545;
       color: white;
     }
+
+       
+    /*pagination*/
+    .page-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 100px); /* adjust based on your header/menu */
+      /*padding: 0 20px;*/
+      box-sizing: border-box;
+    }
+
+    .table-section {
+      flex: 1;
+      overflow-y: auto;
+      /*margin-bottom: 10px;*/
+    }
+    .pagination-wrapper {
+      background-color: #f9f9f9;
+      border-top: 1px solid #ccc;
+      padding: 10px 20px;
+    }
+
+    .pagination-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 16px;
+    }
+
+    .pagination-controls a,
+    .pagination-line .active-page {
+      margin: 0 5px;
+      padding: 4px 10px;
+      text-decoration: none;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: white;
+      color: #333;
+    }
+
+    .pagination-controls a:hover {
+      background-color: #ddd;
+    }
+
+    .active-page {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+
+    
+   

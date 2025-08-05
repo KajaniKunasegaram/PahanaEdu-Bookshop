@@ -36,7 +36,7 @@
         <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/UserServlet')">
           <i class="fas fa-users-cog"></i> Users
         </button>
-        <button class="nav-btn" onclick="loadPage(this, 'stock.jsp')">
+        <button class="nav-btn" onclick="loadPage(this, 'books.jsp')">
           <i class="fas fa-users-cog"></i> Books
         </button>        
         <button class="nav-btn" onclick="loadPage(this, 'reports.jsp')">
@@ -60,9 +60,9 @@
   </div>
 
   <!-- Main Content -->
-  <iframe id="contentFrame" src="${pageContext.request.contextPath}/UserServlet"></iframe>
+  <!--<iframe id="contentFrame" src="${pageContext.request.contextPath}/UserServlet"></iframe>-->
 
-  <!--<iframe id="contentFrame" src="users.jsp"></iframe>-->
+  <iframe id="contentFrame" src="books.jsp"></iframe>
 
   <script>
     function loadPage(button, page) {
