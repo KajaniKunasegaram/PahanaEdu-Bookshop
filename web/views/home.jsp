@@ -62,7 +62,7 @@
   <!-- Main Content -->
   <!--<iframe id="contentFrame" src="${pageContext.request.contextPath}/UserServlet"></iframe>-->
 
-  <iframe id="contentFrame" src="books.jsp"></iframe>
+  <iframe id="contentFrame" src="customers.jsp"></iframe>
 
   <script>
     function loadPage(button, page) {

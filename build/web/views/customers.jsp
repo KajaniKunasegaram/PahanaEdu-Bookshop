@@ -27,9 +27,6 @@
         <th>Name</th>
         <th>Address</th>
         <th>Phone</th>
-        <!--<th>Email</th>-->
-        <th>Unit Consumed</th>
-        <th>Status</th>
         <th>Edit</th>
         <th>Delete</th>
       </tr>
@@ -40,9 +37,6 @@
         <td>Sanjeewa</td>
         <td>Colombo 07</td>
         <td>0771234567</td>
-        <!--<td>sanjeewa@mail.com</td>-->
-        <td>120</td>
-        <td>Active</td>
         <td class="actions">
           <button class="edit" onclick="openAddCustomerPopup()">Edit</button>
         </td>
@@ -50,132 +44,13 @@
           <button class="delete" onclick="openDeleteCustomerPopup()">Delete</button>
         </td>
       </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-        <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-        <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-       <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-       <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-       <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-       <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-       <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
-      <tr>
-        <td>ACC002</td>
-        <td>Ruwanthi</td>
-        <td>Kandy</td>
-        <td>0719876543</td>
-        <!--<td>ruwanthi@mail.com</td>-->
-        <td>90</td>
-        <td>Inactive</td>
-       <td class="actions">
-          <button class="edit" onclick="alert('Edit Customer')">Edit</button>
-        </td>
-         <td class="actions">
-          <button class="delete" onclick="confirm('Are you sure to delete?')">Delete</button>
-        </td>
-      </tr>
+      
     </tbody>
   </table>
 
     
     <div id="addCustomerPopup" class="add-popup-overlay">
-        <div class="add-popup-content">
+        <div class="add-popup-content" style="width: 30%; height: 480px;">
         <div class="add-popup-header">
             <h2>Add New Customer</h2>
             <button class="add-popup_close" onclick="closeAddCustomerPopup()">X</button>
