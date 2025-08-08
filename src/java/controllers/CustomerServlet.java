@@ -24,6 +24,9 @@ import models.CustomerModel;
  *
  * @author HP
  */
+
+
+
 @WebServlet("/CustomerServlet")
 public class CustomerServlet extends HttpServlet
 {
@@ -57,8 +60,8 @@ public class CustomerServlet extends HttpServlet
             String search = request.getParameter("search");
             if (search != null && !search.trim().isEmpty()) {
                 List<CustomerModel> searchResults = searchCustomers(search.trim());
-                request.setAttribute("users", searchResults);
-                request.setAttribute("totalUsers", searchResults.size());
+                request.setAttribute("customers", searchResults);
+                request.setAttribute("totalCustomers", searchResults.size());
                 request.setAttribute("currentPage", 1);
                 request.setAttribute("totalPages", 1);
             } else {
@@ -69,14 +72,14 @@ public class CustomerServlet extends HttpServlet
                     page = Integer.parseInt(request.getParameter("page"));
                 }
 
-                List<CustomerModel> userList = getAllCustomers((page - 1) * recordsPerPage, recordsPerPage);
-                int totalUsers = getCustomerCount();
-                int totalPages = (int) Math.ceil(totalUsers * 1.0 / recordsPerPage);
+                List<CustomerModel> customerList = getAllCustomers((page - 1) * recordsPerPage, recordsPerPage);
+                int totalCustomers = getCustomerCount();
+                int totalPages = (int) Math.ceil(totalCustomers * 1.0 / recordsPerPage);
 
-                request.setAttribute("users", userList);
+                request.setAttribute("customers", customerList);
                 request.setAttribute("currentPage", page);
                 request.setAttribute("totalPages", totalPages);
-                request.setAttribute("totalUsers", totalUsers);
+                request.setAttribute("totalCustomers", totalCustomers);
             }
 
             request.getRequestDispatcher("/views/customers.jsp").forward(request, response);
@@ -107,7 +110,7 @@ public class CustomerServlet extends HttpServlet
                 out.println("window.parent.location.reload();");
                 out.println("alert('✅ Customer added successfully!');");
 
-                out.println("window.parent.closeAddUserPopup();");
+                out.println("window.parent.closeAddCustomerPopup();");
                 out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
                 out.println("</script>");
             } else {
@@ -139,7 +142,7 @@ public class CustomerServlet extends HttpServlet
             pst.setString(1, request.getParameter("name"));
             pst.setString(2, request.getParameter("phone"));
             pst.setString(3, request.getParameter("address"));
-            pst.setString(7, request.getParameter("account_no"));
+            pst.setString(4, request.getParameter("account_no"));
             
             int success = pst.executeUpdate();
             if (success > 0) {
@@ -149,7 +152,7 @@ public class CustomerServlet extends HttpServlet
                 out.println("window.parent.location.reload();");
                 out.println("alert('✅ Customer updated successfully!');");
 
-                out.println("window.parent.closeAddUserPopup();");
+                out.println("window.parent.closeAddCustomerPopup();");
                 out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
                 out.println("</script>");
             } else {
@@ -174,10 +177,10 @@ public class CustomerServlet extends HttpServlet
         try
         {
             Connection connection = DBConnection.getConnection();
-            String query = "DELETE FROM tblcustomer WHERE account_no=?";
+            String query = "DELETE FROM tblcustomer WHERE id=?";
             
             PreparedStatement pst = connection.prepareStatement(query);
-            pst.setInt(1, Integer.parseInt(request.getParameter("account_no")));
+            pst.setInt(1, Integer.parseInt(request.getParameter("id")));
             
             int success = pst.executeUpdate();
             if(success>0)
@@ -202,7 +205,7 @@ public class CustomerServlet extends HttpServlet
 
         try {
             Connection connection = DBConnection.getConnection();
-            String query = "SELECT * FROM tblcustomer ORDER BY id DESC";
+            String query = "SELECT * FROM tblcustomer ORDER BY id DESC LIMIT ? , ?";
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, offset);
             pst.setInt(2, noOfRecords);
@@ -241,12 +244,12 @@ public class CustomerServlet extends HttpServlet
     }
     
     private List<CustomerModel> searchCustomers(String keyword) {
-    List<CustomerModel> Customers = new ArrayList<>();
-
-        try {
-            Connection connection = DBConnection.getConnection();
-            String query = "SELECT * FROM tblcustomer  WHERE account_no LIKE "
-                    + "? OR phone LIKE ? OR address LIKE ? OR name LIKE ?";
+        List<CustomerModel> Customers = new ArrayList<>();
+            try {
+                
+                 Connection connection = DBConnection.getConnection();
+            String query = "SELECT * FROM tblcustomer WHERE name LIKE "
+                    + "? OR phone LIKE ? OR address LIKE ? OR account_no LIKE ?";
             PreparedStatement pst = connection.prepareStatement(query);
             String searchValue = "%" + keyword + "%";
             pst.setString(1, searchValue);
@@ -257,17 +260,19 @@ public class CustomerServlet extends HttpServlet
             ResultSet result = pst.executeQuery();
             while (result.next()) {
                 CustomerModel customer = new CustomerModel();
-                customer.setId(result.getInt("id"));
-                customer.setAccountNo(result.getString("account_no"));
                 customer.setName(result.getString("name"));
+                customer.setAccountNo(result.getString("account_no"));
                 customer.setPhone(result.getString("phone"));
                 customer.setAddress(result.getString("address"));
                 Customers.add(customer);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return Customers;
+            
+                
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return Customers;
     }
+
+
 }

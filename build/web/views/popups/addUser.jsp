@@ -42,7 +42,7 @@
 
                         <div class="add-group">
                             <label for="phone">Phone</label>
-                            <input type="tel" id="phone" name="phone" required value="<%= phone != null ? phone : "" %>">
+                            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required value="<%= phone != null ? phone : "" %>">
 
                             <!--<input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>-->
                         </div>                        

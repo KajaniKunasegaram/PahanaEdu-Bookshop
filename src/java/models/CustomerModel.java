@@ -15,10 +15,12 @@ public class CustomerModel {
     private String phone;
     private String address;
 
+    public CustomerModel() {}
+
     public int getId(){return id;}
     public String getAccountNo() { return account_no; }
     public String getName() { return name; }
-    public String getPhoneNo() { return phone; }
+    public String getPhone() { return phone; }
     public String getAddress() { return address; }
     
     // Setters

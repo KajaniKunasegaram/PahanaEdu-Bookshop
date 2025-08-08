@@ -26,7 +26,7 @@
         <button class="nav-btn active" onclick="loadPage(this, 'dashboard.jsp')">
           <i class="fas fa-tachometer-alt"></i> Dashboard
         </button>
-        <button class="nav-btn" onclick="loadPage(this, 'customers.jsp')">
+        <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/CustomerServlet')">
           <i class="fas fa-user"></i> Customers
         </button>
         <button class="nav-btn" onclick="loadPage(this, 'sales.jsp')">
@@ -60,9 +60,9 @@
   </div>
 
   <!-- Main Content -->
-  <!--<iframe id="contentFrame" src="${pageContext.request.contextPath}/UserServlet"></iframe>-->
+  <iframe id="contentFrame" src="${pageContext.request.contextPath}/CustomerServlet"></iframe>
 
-  <iframe id="contentFrame" src="customers.jsp"></iframe>
+  <!--<iframe id="contentFrame" src="customers.jsp"></iframe>-->
 
   <script>
     function loadPage(button, page) {
