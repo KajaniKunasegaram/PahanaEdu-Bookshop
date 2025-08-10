@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add Stock</title>
+        <title>Add Book</title>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/addPopupStyle.css">
     </head>
     <body>
@@ -20,8 +20,8 @@
 
                     <div class="add-left">
                         <div class="add-group">
-                            <label for="booktitle">Book Title</label>
-                            <input type="text" id="booktitle" name="booktitle" required>
+                            <label for="title">Book Title</label>
+                            <input type="text" id="title" name="title" required>
                         </div>
 
                         <div class="add-group">
@@ -39,8 +39,8 @@
                         </div>
                     
                         <div class="add-group">
-                            <label for="quantity">Quantity</label>
-                            <input type="text" id="quantity" name="quantity" required>
+                            <label for="category">Category</label>
+                            <input type="text" id="category" name="category" required>
                         </div>               
                     </div>
                 </div>

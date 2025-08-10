@@ -4,9 +4,6 @@
  */
 package controllers;
 
-import java.sql.*;
-
-
 import DBAccess.DBConnection;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,21 +12,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
-import models.CustomerModel;
+import models.BookModel;
 
+import java.sql.*;
+import java.util.ArrayList;
 /**
  *
  * @author HP
  */
-
-
-
-@WebServlet("/CustomerServlet")
-public class CustomerServlet extends HttpServlet
-{
-
+@WebServlet("/BookServlet")
+public class BookServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -37,11 +30,11 @@ public class CustomerServlet extends HttpServlet
         
         if("add".equals(action))
         {
-            addCustomer(request,response);
+            addBook(request,response);
         }
         else if("update".equals(action))
         {
-            updateCustomer(request,response);
+            updateBook(request,response);
         }
         
     }
@@ -52,14 +45,14 @@ public class CustomerServlet extends HttpServlet
         String action = request.getParameter("action");
         if("delete".equals(action))
         {
-            deleteCustomer(request,response);
+            deleteBook(request,response);
         }
         else
         {
             String search = request.getParameter("search");
             if (search != null && !search.trim().isEmpty()) {
-                List<CustomerModel> searchResults = searchCustomers(search.trim());
-                request.setAttribute("customers", searchResults);
+                List<BookModel> searchResults = searchCustomers(search.trim());
+                request.setAttribute("Books", searchResults);
                 request.setAttribute("totalCustomers", searchResults.size());
                 request.setAttribute("currentPage", 1);
                 request.setAttribute("totalPages", 1);
@@ -71,34 +64,34 @@ public class CustomerServlet extends HttpServlet
                     page = Integer.parseInt(request.getParameter("page"));
                 }
 
-                List<CustomerModel> customerList = getAllCustomers((page - 1) * recordsPerPage, recordsPerPage);
-                int totalCustomers = getCustomerCount();
-                int totalPages = (int) Math.ceil(totalCustomers * 1.0 / recordsPerPage);
+                List<BookModel> bookList = getAllBooks((page - 1) * recordsPerPage, recordsPerPage);
+                int totalBooks = getBookCount();
+                int totalPages = (int) Math.ceil(totalBooks * 1.0 / recordsPerPage);
 
-                request.setAttribute("customers", customerList);
+                request.setAttribute("books", bookList);
                 request.setAttribute("currentPage", page);
                 request.setAttribute("totalPages", totalPages);
-                request.setAttribute("totalCustomers", totalCustomers);
+                request.setAttribute("totalCustomers", totalBooks);
             }
 
-            request.getRequestDispatcher("/views/customers.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/books.jsp").forward(request, response);
         }
     }
     
-    private void addCustomer(HttpServletRequest request, HttpServletResponse response)
+    private void addBook(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
         try
         {
             Connection connection = DBConnection.getConnection();
             System.out.println("✅ Connection successful");
-            String query ="INSERT INTO tblcustomer (account_no, name, phone, address) VALUES (?, ?, ?, ?)";
+            String query ="INSERT INTO tblbook (account_no, name, phone, address) VALUES (?, ?, ?, ?)";
             PreparedStatement pst = connection.prepareStatement(query);
             
-            pst.setString(1, request.getParameter("account_no"));
-            pst.setString(2, request.getParameter("name"));
-            pst.setString(3, request.getParameter("phone"));
-            pst.setString(4, request.getParameter("address"));
+            pst.setString(1, request.getParameter("title"));
+            pst.setString(2, request.getParameter("author"));
+            pst.setString(3, request.getParameter("price"));
+            pst.setString(4, request.getParameter("categoryName"));
             
             int rowInserted = pst.executeUpdate();
 
@@ -107,7 +100,7 @@ public class CustomerServlet extends HttpServlet
                 PrintWriter out = response.getWriter();
                 out.println("<script>");
                 out.println("window.parent.location.reload();");
-                out.println("alert('✅ Customer added successfully!');");
+                out.println("alert('✅ Book added successfully!');");
 
                 out.println("window.parent.closeAddCustomerPopup();");
                 out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
@@ -116,7 +109,7 @@ public class CustomerServlet extends HttpServlet
                 response.setContentType("text/html");
                 PrintWriter out = response.getWriter();
                 out.println("<script>");
-                out.println("alert('❌ Failed to add customer');");
+                out.println("alert('❌ Failed to add book');");
                 out.println("window.history.back();");
                 out.println("</script>");
             }
@@ -129,19 +122,19 @@ public class CustomerServlet extends HttpServlet
     }
     
     
-     private void updateCustomer(HttpServletRequest request, HttpServletResponse response)
+    private void updateBook(HttpServletRequest request, HttpServletResponse response)
             throws IOException
     {
         try
         {
             Connection connection = DBConnection.getConnection();
-            String query ="UPDATE tblcustomer SET name=?, phone=?, address=? WHERE account_no=?";
+            String query ="UPDATE tblBook SET title=?, author=?, price=?,categoryName=? WHERE id=?";
             
             PreparedStatement pst = connection.prepareStatement(query);
-            pst.setString(1, request.getParameter("name"));
-            pst.setString(2, request.getParameter("phone"));
-            pst.setString(3, request.getParameter("address"));
-            pst.setString(4, request.getParameter("account_no"));
+            pst.setString(1, request.getParameter("title"));
+            pst.setString(2, request.getParameter("author"));
+            pst.setString(3, request.getParameter("price"));
+            pst.setString(4, request.getParameter("categoryName"));
             
             int success = pst.executeUpdate();
             if (success > 0) {
@@ -149,7 +142,7 @@ public class CustomerServlet extends HttpServlet
                 PrintWriter out = response.getWriter();
                 out.println("<script>");
                 out.println("window.parent.location.reload();");
-                out.println("alert('✅ Customer updated successfully!');");
+                out.println("alert('✅ Book updated successfully!');");
 
                 out.println("window.parent.closeAddCustomerPopup();");
                 out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
@@ -158,7 +151,7 @@ public class CustomerServlet extends HttpServlet
                 response.setContentType("text/html");
                 PrintWriter out = response.getWriter();
                 out.println("<script>");
-                out.println("alert('❌ Failed to update Customer');");
+                out.println("alert('❌ Failed to update Book');");
                 out.println("window.history.back();");
                 out.println("</script>");
             }
@@ -170,13 +163,13 @@ public class CustomerServlet extends HttpServlet
     }
      
      
-    private void deleteCustomer(HttpServletRequest request, HttpServletResponse response)
+    private void deleteBook(HttpServletRequest request, HttpServletResponse response)
             throws IOException
     {
         try
         {
             Connection connection = DBConnection.getConnection();
-            String query = "DELETE FROM tblcustomer WHERE id=?";
+            String query = "DELETE FROM tblbook WHERE id=?";
             
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, Integer.parseInt(request.getParameter("id")));
@@ -188,7 +181,7 @@ public class CustomerServlet extends HttpServlet
                 PrintWriter out = response.getWriter();
                 out.println("<script>");
                 out.println("window.parent.location.reload();");
-                out.println("alert('✅ customer deleted successfully!');");
+                out.println("alert('✅ book deleted successfully!');");
                 out.println("</script>");
             }
         }
@@ -199,25 +192,25 @@ public class CustomerServlet extends HttpServlet
         }
     }
     
-    private List<CustomerModel> getAllCustomers(int offset, int noOfRecords) {
-        List<CustomerModel> Customers = new ArrayList<>();
+    private List<BookModel> getAllBooks(int offset, int noOfRecords) {
+        List<BookModel> Customers = new ArrayList<>();
 
         try {
             Connection connection = DBConnection.getConnection();
-            String query = "SELECT * FROM tblcustomer ORDER BY id DESC LIMIT ? , ?";
+            String query = "SELECT * FROM tblbook ORDER BY id DESC LIMIT ? , ?";
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, offset);
             pst.setInt(2, noOfRecords);
             ResultSet result = pst.executeQuery();
 
             while (result.next()) {
-                CustomerModel customer = new CustomerModel();
-                customer.setId(result.getInt("id"));
-                customer.setAccountNo(result.getString("account_no"));
-                customer.setName(result.getString("name"));
-                customer.setPhone(result.getString("phone"));
-                customer.setAddress(result.getString("address"));
-                Customers.add(customer);
+                BookModel book = new BookModel();
+                book.setId(result.getInt("id"));
+                book.setTitle(result.getString("title"));
+                book.setAuthor(result.getString("author"));
+                book.setPrice(result.getDouble("price"));
+                book.setCategoryName(result.getString("categoryName"));
+                Customers.add(book);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -226,7 +219,7 @@ public class CustomerServlet extends HttpServlet
         return Customers;
     }
     
-    private int getCustomerCount() {
+    private int getBookCount() {
         int count = 0;
         try {
             Connection connection = DBConnection.getConnection();
@@ -242,13 +235,13 @@ public class CustomerServlet extends HttpServlet
         return count;
     }
     
-    private List<CustomerModel> searchCustomers(String keyword) {
-        List<CustomerModel> Customers = new ArrayList<>();
+    private List<BookModel> searchCustomers(String keyword) {
+        List<BookModel> Books = new ArrayList<>();
             try {
                 
                  Connection connection = DBConnection.getConnection();
-            String query = "SELECT * FROM tblcustomer WHERE name LIKE "
-                    + "? OR phone LIKE ? OR address LIKE ? OR account_no LIKE ?";
+            String query = "SELECT * FROM tblbook WHERE title LIKE "
+                    + "? OR price LIKE ? OR author LIKE ? OR categoryName LIKE ?";
             PreparedStatement pst = connection.prepareStatement(query);
             String searchValue = "%" + keyword + "%";
             pst.setString(1, searchValue);
@@ -258,19 +251,19 @@ public class CustomerServlet extends HttpServlet
             
             ResultSet result = pst.executeQuery();
             while (result.next()) {
-                CustomerModel customer = new CustomerModel();
-                customer.setName(result.getString("name"));
-                customer.setAccountNo(result.getString("account_no"));
-                customer.setPhone(result.getString("phone"));
-                customer.setAddress(result.getString("address"));
-                Customers.add(customer);
+                BookModel book = new BookModel();
+                book.setTitle(result.getString("title"));
+                book.setAuthor(result.getString("author"));
+                book.setPrice(result.getDouble("price"));
+                book.setCategoryName(result.getString("categoryName"));
+                Books.add(book);
             }
             
                 
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            return Customers;
+            return Books;
     }
 
 

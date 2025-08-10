@@ -23,7 +23,7 @@
   <!-- Top Navbar -->
   <div class="navbar">
     <div class="nav-links">
-        <button class="nav-btn active" onclick="loadPage(this, 'dashboard.jsp')">
+        <button class="nav-btn " onclick="loadPage(this, 'dashboard.jsp')">
           <i class="fas fa-tachometer-alt"></i> Dashboard
         </button>
         <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/CustomerServlet')">
@@ -36,6 +36,9 @@
         <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/UserServlet')">
           <i class="fas fa-users-cog"></i> Users
         </button>
+        <button class="nav-btn active" onclick="loadPage(this, '${pageContext.request.contextPath}/CategoryServlet')">
+          <i class="fas fa-users-cog"></i> Category
+        </button> 
         <button class="nav-btn" onclick="loadPage(this, 'books.jsp')">
           <i class="fas fa-users-cog"></i> Books
         </button>        
@@ -60,9 +63,9 @@
   </div>
 
   <!-- Main Content -->
-  <iframe id="contentFrame" src="${pageContext.request.contextPath}/CustomerServlet"></iframe>
+  <iframe id="contentFrame" src="${pageContext.request.contextPath}/CategoryServlet"></iframe>
 
-  <!--<iframe id="contentFrame" src="customers.jsp"></iframe>-->
+  <!--<iframe id="contentFrame" src="category.jsp"></iframe>-->
 
   <script>
     function loadPage(button, page) {

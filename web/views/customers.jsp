@@ -143,7 +143,7 @@
     </div>
     
     <div id="addCustomerPopup" class="add-popup-overlay">
-        <div class="add-popup-content" style="width: 30%; height: 480px;">
+        <div class="add-popup-content" >
         <div class="add-popup-header">
             <h2 id="popup-title">Add New Customer</h2>
             <button class="add-popup_close" onclick="closeAddCustomerPopup()">X</button>
@@ -207,5 +207,9 @@
             input.setSelectionRange(length, length);
         };
     </script>
+    
+    
+
+    
 </body>
 </html>
