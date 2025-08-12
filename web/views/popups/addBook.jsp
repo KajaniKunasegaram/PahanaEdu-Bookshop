@@ -4,88 +4,104 @@
     Author     : HP
 --%>
 
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="models.CategoryModel"%>
+<%@page import="models.BookModel"%>
+
+<%
+    String action = request.getParameter("action");
+    BookModel book = (BookModel) request.getAttribute("book");
+
+    String id = (book != null) ? String.valueOf(book.getId()) : "";
+    String title = (book != null) ? book.getTitle() : "";
+    String author = (book != null) ? book.getAuthor() : "";
+    String price = (book != null) ? String.valueOf(book.getPrice()) : "";
+    String category_id = (book != null) ? String.valueOf(book.getCategoryId()) : "";
+    String image_path = (book != null) ? book.getImagePath() : "";
+
+    boolean isUpdate = "update".equalsIgnoreCase(action);
+
+    List<CategoryModel> categories = (List<CategoryModel>) request.getAttribute("categories");
+%>
+
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add Book</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/addPopupStyle.css">
-        <style>
-        .category-container {
-            display: flex;
-            width: 100%;
-            gap: 5px; /* space between select and button */
-        }
+<head>
+  <meta charset="UTF-8">
+  <title><%= isUpdate ? "Update Book" : "Add Book" %></title>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/addPopupStyle.css">
+  <style>
+      .img-preview {
+          margin-top: 8px;
+          max-width: 120px;
+          max-height: 160px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+      }
+  </style>
+</head>
+<body>
 
-        .category-container select {
-            flex: 1; /* take remaining width */
-            padding: 4px;
-            font-size: 14px;
-        }
+<div class="container">
+  <form action="${pageContext.request.contextPath}/BookServlet" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="<%= isUpdate ? "update" : "add" %>">
+        <input type="hidden" name="id" value="<%= id %>">
+        <input type="hidden" name="oldImage" value="<%= image_path %>"><!-- Keep old image path -->
 
-        .category-container button {
-            padding: 4px 8px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <!--<h2>Add New Customer</h2>-->
-            <form action="SaveCustomerServlet" method="post">
-                <div class="add-container">
-
-                    <div class="add-left">
-                        <div class="add-group">
-                            <label for="title">Book Title</label>
-                            <input type="text" id="title" name="title" required>
-                        </div>
-
-                        <div class="add-group">
-                            <label for="author">Author</label>
-                            <input type="text" id="author" name="author" required>
-                        </div>                   
-                        
-                    </div>
-
-                    <div class="add-right">
-
-                       <div class="add-group">
-                            <label for="price">Price</label>
-                            <input type="text" id="price" name="price" required>
-                        </div>
-                    
-                        <div class="add-group">
-                            <label for="category">Category</label>
-                            <div class="category-container">
-                                <select id="category" name="category" required>
-                                    <option value="">-- Select Category --</option>                                
-                                    <option>vdff</option>                                
-                                </select>
-                                <button type="button" id="addCategoryBtn" title="Add New Category" onclick="openAddCategoryPopup()">+</button>
-                            </div>
-                        </div>               
-                    </div>
-                </div>
-                <div class="add-actions">
-                    <button type="submit" class="btn-save">Save</button>
-                    <button type="button" class="btn-cancel" onclick="parent.closeAddCustomerPopup()">Cancel</button>
-                </div>
-            </form>
+        <div class="add-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required value="<%= title %>">
         </div>
-        
-        
-        <script>
-            function openAddCategoryPopup() {
-                var popup = window.open(
-                    "views/popups/addCategory.jsp", // path to popup JSP
-                    "Add Category",
-                    "width=500,height=400,resizable=no,scrollbars=yes"
-                );
-            }
-            </script>
-    </body>
+
+        <div class="add-group">
+            <label for="author">Author</label>
+            <input type="text" id="author" name="author" value="<%= author %>">
+        </div>
+
+        <div class="add-group">
+            <label for="price">Price</label>
+            <input type="number" step="0.01" id="price" name="price" value="<%= price %>">
+        </div>
+
+        <div class="add-group">
+            <label for="category_id">Category</label>
+            <select id="category_id" name="category_id" required>
+                <option value="">-- Select Category --</option>
+                <%
+                    if (categories != null && !categories.isEmpty()) {
+                        for (CategoryModel c : categories) {
+                            String selected = (category_id != null && category_id.equals(String.valueOf(c.getId()))) ? "selected" : "";
+                %>
+                            <option value="<%= c.getId() %>" <%= selected %>><%= c.getName() %></option>
+                <%
+                        }
+                    } else {
+                %>
+                    <option disabled style="color:red;">No categories available</option>
+                <%
+                    }
+                %>
+            </select>
+        </div>
+
+        <div class="add-group">
+            <label for="image_path">Book Image</label>
+            <input type="file" id="image_path" name="image_path" accept="image/*" <%= isUpdate ? "" : "required" %>>
+            <% if (isUpdate && image_path != null && !image_path.isEmpty()) { %>
+                <img src="${pageContext.request.contextPath}/uploads/<%= image_path %>" 
+                     alt="Current Book Image" class="img-preview">
+            <% } %>
+        </div>
+
+        <div class="add-actions" style="margin-right: 10px;">
+            <button type="submit" class="btn-save">Save</button>
+            <button type="button" class="btn-cancel" onclick="parent.closeAddBookPopup()">Cancel</button>
+        </div>
+    </form>
+</div>
+
+</body>
 </html>
