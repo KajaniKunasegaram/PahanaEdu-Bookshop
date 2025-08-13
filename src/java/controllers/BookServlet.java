@@ -106,10 +106,11 @@ public class BookServlet extends HttpServlet {
         request.getRequestDispatcher("views/books.jsp").forward(request, response);
     }
 
-   
     private void addBook(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         try (Connection connection = DBConnection.getConnection()) {
+            connection.setAutoCommit(false); // Start transaction
+
             String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) uploadDir.mkdir();
@@ -119,48 +120,68 @@ public class BookServlet extends HttpServlet {
             String fileName = null;
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                filePart.write(uploadPath + File.separator + fileName); // Save file to /uploads
+                filePart.write(uploadPath + File.separator + fileName);
             }
 
-            String query = "INSERT INTO tblbook (title, author, price, category_id, image_path) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pst = connection.prepareStatement(query);
+            // Insert into tblbook and get ID
+            String bookQuery = "INSERT INTO tblbook (title, author, price, category_id, image_path) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement pst = connection.prepareStatement(bookQuery, Statement.RETURN_GENERATED_KEYS);
 
             pst.setString(1, request.getParameter("title"));
             pst.setString(2, request.getParameter("author"));
             pst.setDouble(3, Double.parseDouble(request.getParameter("price")));
-            pst.setInt(4, Integer.parseInt(request.getParameter("category_id"))); // note: lowercase to match JSP
-            pst.setString(5, fileName != null ? fileName : ""); // store only file name
+            pst.setInt(4, Integer.parseInt(request.getParameter("category_id")));
+            pst.setString(5, fileName != null ? fileName : "");
 
             int rowInserted = pst.executeUpdate();
 
-//            PrintWriter out = response.getWriter();
-//            response.setContentType("text/html");
-
             if (rowInserted > 0) {
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("window.parent.location.reload();");
-                out.println("alert('✅ Book added successfully!');");
+                ResultSet rs = pst.getGeneratedKeys();
+                int bookId = 0;
+                if (rs.next()) {
+                    bookId = rs.getInt(1);
+                }
 
-                out.println("window.parent.closeAddBookPopup();");
-                out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
-                out.println("</script>");
+                if (bookId > 0) {
+                    // Insert into tblstock
+                    int initialQuantity = 0; // Change if you want from form
+                    String stockQuery = "INSERT INTO tblstock (book_id, quantity) VALUES (?, ?)";
+                    PreparedStatement stockPst = connection.prepareStatement(stockQuery);
+                    stockPst.setInt(1, bookId);
+                    stockPst.setInt(2, initialQuantity);
+
+                    int stockInserted = stockPst.executeUpdate();
+
+                    if (stockInserted > 0) {
+                        connection.commit(); // Commit both inserts
+                        response.setContentType("text/html");
+                        PrintWriter out = response.getWriter();
+                        out.println("<script>");
+                        out.println("alert('✅ Book and stock added successfully!');");
+                        out.println("window.parent.closeAddBookPopup();");
+                        out.println("window.parent.location.reload();");
+                        out.println("</script>");
+                        return;
+                    } else {
+                        throw new SQLException("Failed to insert into tblstock.");
+                    }
+                } else {
+                    throw new SQLException("Failed to retrieve new book ID.");
+                }
             } else {
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("alert('❌ Failed to add book');");
-                out.println("window.history.back();");
-                out.println("</script>");
+                throw new SQLException("Failed to insert into tblbook.");
             }
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            response.sendError(500, "Internal server error");
+            response.setContentType("text/plain");
+            ex.printStackTrace(response.getWriter()); // Show exact error in browser
         }
     }
 
+    
+ 
+    
     private void updateBook(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         try (Connection connection = DBConnection.getConnection()) {
@@ -223,59 +244,33 @@ public class BookServlet extends HttpServlet {
     
     private List<BookModel> getAllBooks(int offset, int noOfRecords) {
     List<BookModel> books = new ArrayList<>();
-    try (Connection connection = DBConnection.getConnection()) {
-        String query = "SELECT b.*, c.category_name " +
-                       "FROM tblbook b " +
-                       "JOIN tblcategory c ON b.category_id = c.id " +
-                       "ORDER BY b.id DESC LIMIT ?, ?";
-        PreparedStatement pst = connection.prepareStatement(query);
-        pst.setInt(1, offset);
-        pst.setInt(2, noOfRecords);
+        try (Connection connection = DBConnection.getConnection()) {
+            String query = "SELECT b.*, c.category_name " +
+                           "FROM tblbook b " +
+                           "JOIN tblcategory c ON b.category_id = c.id " +
+                           "ORDER BY b.id DESC LIMIT ?, ?";
+            PreparedStatement pst = connection.prepareStatement(query);
+            pst.setInt(1, offset);
+            pst.setInt(2, noOfRecords);
 
-        ResultSet rs = pst.executeQuery();
-        while (rs.next()) {
-            BookModel book = new BookModel();
-            book.setId(rs.getInt("id"));
-            book.setTitle(rs.getString("title"));
-            book.setAuthor(rs.getString("author"));
-            book.setPrice(rs.getDouble("price"));
-            book.setCategoryId(rs.getInt("category_id"));
-            book.setCategoryName(rs.getString("category_name")); // ✅ set category name
-            book.setImagePath(rs.getString("image_path"));
-            books.add(book);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                BookModel book = new BookModel();
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+                book.setPrice(rs.getDouble("price"));
+                book.setCategoryId(rs.getInt("category_id"));
+                book.setCategoryName(rs.getString("category_name")); // ✅ set category name
+                book.setImagePath(rs.getString("image_path"));
+                books.add(book);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return books;
     }
-    return books;
-}
-    
-//
-//    private List<BookModel> getAllBooks(int offset, int noOfRecords) {
-//        List<BookModel> books = new ArrayList<>();
-//        try (Connection connection = DBConnection.getConnection()) {
-//            String query = "SELECT * FROM tblbook ORDER BY id DESC LIMIT ?, ?";
-//            PreparedStatement pst = connection.prepareStatement(query);
-//            pst.setInt(1, offset);
-//            pst.setInt(2, noOfRecords);
-//
-//            ResultSet rs = pst.executeQuery();
-//            while (rs.next()) {
-//                BookModel book = new BookModel();
-//                book.setId(rs.getInt("id"));
-//                book.setTitle(rs.getString("title"));
-//                book.setAuthor(rs.getString("author"));
-//                book.setPrice(rs.getDouble("price"));
-//                book.setCategoryId(rs.getInt("category_id"));
-//                book.setImagePath(rs.getString("image_path"));
-//                books.add(book);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return books;
-//    }
-
+  
     private BookModel getBookById(int id) {
         BookModel book = null;
         try (Connection connection = DBConnection.getConnection()) {
@@ -313,18 +308,21 @@ public class BookServlet extends HttpServlet {
         }
         return count;
     }
-
+    
     private List<BookModel> searchBooks(String keyword) {
-        List<BookModel> books = new ArrayList<>();
+    List<BookModel> books = new ArrayList<>();
         try (Connection connection = DBConnection.getConnection()) {
-            String query = "SELECT * FROM tblbook WHERE title LIKE ? OR author LIKE ? OR price LIKE ? OR category_id LIKE ?";
+            String query = "SELECT b.*, c.category_name " +
+                           "FROM tblbook b " +
+                           "JOIN tblcategory c ON b.category_id = c.id " +
+                           "WHERE b.title LIKE ? OR b.author LIKE ? OR b.price LIKE ? OR c.category_name LIKE ?";
+
             PreparedStatement pst = connection.prepareStatement(query);
             String searchValue = "%" + keyword + "%";
             pst.setString(1, searchValue);
             pst.setString(2, searchValue);
             pst.setString(3, searchValue);
             pst.setString(4, searchValue);
-
 
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
@@ -334,16 +332,17 @@ public class BookServlet extends HttpServlet {
                 book.setAuthor(rs.getString("author"));
                 book.setPrice(rs.getDouble("price"));
                 book.setCategoryId(rs.getInt("category_id"));
+                book.setCategoryName(rs.getString("category_name")); // ✅ Now this works
                 book.setImagePath(rs.getString("image_path"));
-
                 books.add(book);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-     
+
         return books;
     }
+
     private List<CategoryModel> loadCategories() {
         List<CategoryModel> categories = new ArrayList<>();
         try (Connection connection = DBConnection.getConnection()) {

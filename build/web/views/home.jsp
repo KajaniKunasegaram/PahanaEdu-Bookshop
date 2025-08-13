@@ -41,7 +41,11 @@
         </button> 
         <button class="nav-btn active" onclick="loadPage(this, '${pageContext.request.contextPath}/BookServlet')">
           <i class="fas fa-users-cog"></i> Books
-        </button>        
+        </button> 
+        <button class="nav-btn active" onclick="loadPage(this, '${pageContext.request.contextPath}/StockServlet')">
+          <i class="fas fa-users-cog"></i> Stocks
+        </button> 
+          
         <button class="nav-btn" onclick="loadPage(this, 'reports.jsp')">
           <i class="fas fa-books"></i> Reports
         </button>
