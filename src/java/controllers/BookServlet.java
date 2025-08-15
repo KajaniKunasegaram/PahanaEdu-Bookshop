@@ -145,10 +145,13 @@ public class BookServlet extends HttpServlet {
                 if (bookId > 0) {
                     // Insert into tblstock
                     int initialQuantity = 0; // Change if you want from form
-                    String stockQuery = "INSERT INTO tblstock (book_id, quantity) VALUES (?, ?)";
+                    int totalQuantity = 0;
+                    String stockQuery = "INSERT INTO tblstock (book_id, quantity,total_qty) VALUES (?, ?, ?)";
                     PreparedStatement stockPst = connection.prepareStatement(stockQuery);
                     stockPst.setInt(1, bookId);
                     stockPst.setInt(2, initialQuantity);
+                    stockPst.setInt(3, totalQuantity);
+
 
                     int stockInserted = stockPst.executeUpdate();
 

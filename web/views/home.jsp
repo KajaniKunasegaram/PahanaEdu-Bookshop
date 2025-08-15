@@ -39,7 +39,7 @@
         <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/CategoryServlet')">
           <i class="fas fa-users-cog"></i> Category
         </button> 
-        <button class="nav-btn active" onclick="loadPage(this, '${pageContext.request.contextPath}/BookServlet')">
+        <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/BookServlet')">
           <i class="fas fa-users-cog"></i> Books
         </button> 
         <button class="nav-btn active" onclick="loadPage(this, '${pageContext.request.contextPath}/StockServlet')">
@@ -67,7 +67,7 @@
   </div>
 
   <!-- Main Content -->
-    <iframe id="contentFrame" src="${pageContext.request.contextPath}/BookServlet"></iframe>
+    <iframe id="contentFrame" src="${pageContext.request.contextPath}/StockServlet"></iframe>
 
   <!--<iframe id="contentFrame" src="category.jsp"></iframe>-->
 
