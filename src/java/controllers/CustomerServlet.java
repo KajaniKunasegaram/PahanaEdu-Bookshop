@@ -90,7 +90,7 @@ public class CustomerServlet extends HttpServlet
     {
         try
         {
-            Connection connection = DBConnection.getConnection();
+            Connection connection = DBConnection.getInstance().getConnection();
             System.out.println("✅ Connection successful");
             String query ="INSERT INTO tblcustomer (account_no, name, phone, address) VALUES (?, ?, ?, ?)";
             PreparedStatement pst = connection.prepareStatement(query);
@@ -134,7 +134,7 @@ public class CustomerServlet extends HttpServlet
     {
         try
         {
-            Connection connection = DBConnection.getConnection();
+            Connection connection = DBConnection.getInstance().getConnection();
             String query ="UPDATE tblcustomer SET name=?, phone=?, address=? WHERE account_no=?";
             
             PreparedStatement pst = connection.prepareStatement(query);
@@ -175,7 +175,7 @@ public class CustomerServlet extends HttpServlet
     {
         try
         {
-            Connection connection = DBConnection.getConnection();
+            Connection connection = DBConnection.getInstance().getConnection();
             String query = "DELETE FROM tblcustomer WHERE id=?";
             
             PreparedStatement pst = connection.prepareStatement(query);
@@ -203,7 +203,7 @@ public class CustomerServlet extends HttpServlet
         List<CustomerModel> Customers = new ArrayList<>();
 
         try {
-            Connection connection = DBConnection.getConnection();
+            Connection connection = DBConnection.getInstance().getConnection();
             String query = "SELECT * FROM tblcustomer ORDER BY id DESC LIMIT ? , ?";
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, offset);
@@ -229,7 +229,7 @@ public class CustomerServlet extends HttpServlet
     private int getCustomerCount() {
         int count = 0;
         try {
-            Connection connection = DBConnection.getConnection();
+            Connection connection = DBConnection.getInstance().getConnection();
             String query = "SELECT COUNT(*) FROM tblcustomer ";
             PreparedStatement pst = connection.prepareStatement(query);
             ResultSet rs = pst.executeQuery();
@@ -246,7 +246,7 @@ public class CustomerServlet extends HttpServlet
         List<CustomerModel> Customers = new ArrayList<>();
             try {
                 
-                 Connection connection = DBConnection.getConnection();
+                 Connection connection = DBConnection.getInstance().getConnection();
             String query = "SELECT * FROM tblcustomer WHERE name LIKE "
                     + "? OR phone LIKE ? OR address LIKE ? OR account_no LIKE ?";
             PreparedStatement pst = connection.prepareStatement(query);

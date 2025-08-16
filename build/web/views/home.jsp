@@ -29,7 +29,7 @@
         <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/CustomerServlet')">
           <i class="fas fa-user"></i> Customers
         </button>
-        <button class="nav-btn" onclick="loadPage(this, 'sales.jsp')">
+        <button class="nav-btn active" onclick="loadPage(this, '${pageContext.request.contextPath}/SalesServlet')">
           <i class="fas fa-shopping-cart"></i> Sales
         </button>
         <!--<button class="nav-btn" onclick="loadPage(this, 'users.jsp')">-->
@@ -42,7 +42,7 @@
         <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/BookServlet')">
           <i class="fas fa-users-cog"></i> Books
         </button> 
-        <button class="nav-btn active" onclick="loadPage(this, '${pageContext.request.contextPath}/StockServlet')">
+        <button class="nav-btn" onclick="loadPage(this, '${pageContext.request.contextPath}/StockServlet')">
           <i class="fas fa-users-cog"></i> Stocks
         </button> 
           
@@ -67,9 +67,9 @@
   </div>
 
   <!-- Main Content -->
-    <iframe id="contentFrame" src="${pageContext.request.contextPath}/StockServlet"></iframe>
+    <iframe id="contentFrame" src="${pageContext.request.contextPath}/SalesServlet"></iframe>
 
-  <!--<iframe id="contentFrame" src="category.jsp"></iframe>-->
+  <!--<iframe id="contentFrame" src="sales.jsp"></iframe>-->
 
   <script>
     function loadPage(button, page) {

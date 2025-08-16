@@ -72,7 +72,7 @@ public class StockServlet extends HttpServlet {
         int stockId = Integer.parseInt(request.getParameter("stockId"));
         int qtyToAdd = Integer.parseInt(request.getParameter("qty"));
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = DBConnection.getInstance().getConnection()) {
 
             // Get current quantities
             String selectSQL = "SELECT quantity, total_qty FROM tblstock WHERE id = ?";
@@ -109,7 +109,7 @@ public class StockServlet extends HttpServlet {
         int count = 0;
         String query = "SELECT COUNT(*) FROM tblstock";
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getInstance().getConnection();
              PreparedStatement pst = connection.prepareStatement(query);
              ResultSet rs = pst.executeQuery()) {
 
@@ -136,7 +136,7 @@ public class StockServlet extends HttpServlet {
                 "   OR CAST(b.price AS CHAR) LIKE ? " +
                 "ORDER BY b.title";
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getInstance().getConnection();
              PreparedStatement pst = connection.prepareStatement(query)) {
 
             String searchValue = "%" + keyword + "%";
@@ -173,7 +173,7 @@ public class StockServlet extends HttpServlet {
                 "JOIN tblcategory c ON b.category_id = c.id " +
                 "ORDER BY b.title LIMIT ?, ?";
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection = DBConnection.getInstance().getConnection();
              PreparedStatement pst = connection.prepareStatement(query)) {
 
             pst.setInt(1, offset);

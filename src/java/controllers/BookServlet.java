@@ -108,7 +108,7 @@ public class BookServlet extends HttpServlet {
 
     private void addBook(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             connection.setAutoCommit(false); // Start transaction
 
             String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
@@ -187,7 +187,7 @@ public class BookServlet extends HttpServlet {
     
     private void updateBook(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "UPDATE tblbook SET title=?, author=?, price=?, category_id=?, image_path=? WHERE id=?";
 
             PreparedStatement pst = connection.prepareStatement(query);
@@ -225,7 +225,7 @@ public class BookServlet extends HttpServlet {
 
     private void deleteBook(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "DELETE FROM tblbook WHERE id=?";
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, Integer.parseInt(request.getParameter("id")));
@@ -247,7 +247,7 @@ public class BookServlet extends HttpServlet {
     
     private List<BookModel> getAllBooks(int offset, int noOfRecords) {
     List<BookModel> books = new ArrayList<>();
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT b.*, c.category_name " +
                            "FROM tblbook b " +
                            "JOIN tblcategory c ON b.category_id = c.id " +
@@ -276,7 +276,7 @@ public class BookServlet extends HttpServlet {
   
     private BookModel getBookById(int id) {
         BookModel book = null;
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT * FROM tblbook WHERE id=?";
             PreparedStatement pst = connection.prepareStatement(query);
             pst.setInt(1, id);
@@ -299,7 +299,7 @@ public class BookServlet extends HttpServlet {
 
     private int getBookCount() {
         int count = 0;
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT COUNT(*) FROM tblbook";
             PreparedStatement pst = connection.prepareStatement(query);
             ResultSet rs = pst.executeQuery();
@@ -314,7 +314,7 @@ public class BookServlet extends HttpServlet {
     
     private List<BookModel> searchBooks(String keyword) {
     List<BookModel> books = new ArrayList<>();
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT b.*, c.category_name " +
                            "FROM tblbook b " +
                            "JOIN tblcategory c ON b.category_id = c.id " +
@@ -348,7 +348,7 @@ public class BookServlet extends HttpServlet {
 
     private List<CategoryModel> loadCategories() {
         List<CategoryModel> categories = new ArrayList<>();
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT id, category_name, description FROM tblcategory ORDER BY id DESC";
             PreparedStatement pst = connection.prepareStatement(query);
             ResultSet rs = pst.executeQuery();

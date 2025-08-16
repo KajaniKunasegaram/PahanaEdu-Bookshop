@@ -73,7 +73,7 @@ public class CategoryServlet extends HttpServlet {
 
     private void addCategory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "INSERT INTO tblcategory (category_name, description) VALUES (?, ?)";
             try (PreparedStatement pst = connection.prepareStatement(query)) {
                 pst.setString(1, request.getParameter("category_name"));
@@ -106,7 +106,7 @@ public class CategoryServlet extends HttpServlet {
 
     private void updateCategory(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String idStr = request.getParameter("id");
             if (idStr == null || idStr.isEmpty()) {
                 response.sendError(400, "Missing id parameter");
@@ -155,7 +155,7 @@ public class CategoryServlet extends HttpServlet {
 
     private void deleteCategory(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String idStr = request.getParameter("id");
             if (idStr == null || idStr.isEmpty()) {
                 response.sendError(400, "Missing id parameter");
@@ -191,7 +191,7 @@ public class CategoryServlet extends HttpServlet {
 
     private List<CategoryModel> getAllCategories(int offset, int noOfRecords) {
         List<CategoryModel> categories = new ArrayList<>();
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT id, category_name, description  FROM tblcategory ORDER BY id DESC LIMIT ? , ?";
             try (PreparedStatement pst = connection.prepareStatement(query)) {
                 pst.setInt(1, offset);
@@ -215,7 +215,7 @@ public class CategoryServlet extends HttpServlet {
 
     private int getCategoriesCount() {
         int count = 0;
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT COUNT(*) FROM tblcategory";
             try (PreparedStatement pst = connection.prepareStatement(query);
                     ResultSet rs = pst.executeQuery()) {
@@ -231,7 +231,7 @@ public class CategoryServlet extends HttpServlet {
 
     private List<CategoryModel> searchCategories(String keyword) {
         List<CategoryModel> categories = new ArrayList<>();
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = DBConnection.getInstance().getConnection()) {
             String query = "SELECT * FROM tblcategory WHERE category_name LIKE ? OR description LIKE ?";
             try (PreparedStatement pst = connection.prepareStatement(query)) {
                 String searchValue = "%" + keyword + "%";

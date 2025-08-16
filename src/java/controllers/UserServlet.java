@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import models.UserModel;
+import services.UserService;
 
 /**
  *
@@ -24,321 +25,79 @@ import models.UserModel;
  */
 @WebServlet("/UserServlet")
 public class UserServlet extends HttpServlet {
-  
+    
+     private UserService userService = new UserService();
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String action = request.getParameter("action");
-        
-        if("add".equals(action))
-        {
-            addUser(request,response);
-        }
-        else if("update".equals(action))
-        {
-            updateUser(request,response);
-        }
-        
-    }
-    
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        String action = request.getParameter("action");
-        if("delete".equals(action))
-        {
-            deleteUser(request,response);
-        }
-        else
-        {
-            String search = request.getParameter("search");
-            if (search != null && !search.trim().isEmpty()) {
-                List<UserModel> searchResults = searchUsers(search.trim());
-                request.setAttribute("users", searchResults);
-                request.setAttribute("totalUsers", searchResults.size());
-                request.setAttribute("currentPage", 1);
-                request.setAttribute("totalPages", 1);
-            } else {
-                int page = 1;
-                int recordsPerPage = 10;
 
-                if (request.getParameter("page") != null) {
-                    page = Integer.parseInt(request.getParameter("page"));
+        String action = request.getParameter("action");
+
+        UserModel user = new UserModel();
+        user.setUsername(request.getParameter("username"));
+        user.setPassword(request.getParameter("password"));
+        user.setPhone(request.getParameter("phone"));
+        user.setMail(request.getParameter("email"));
+        user.setStatus(request.getParameter("status"));
+        user.setRole(request.getParameter("role"));
+        user.setAddress(request.getParameter("address"));
+
+        try {
+            if ("add".equals(action)) {
+                userService.addUser(user);
+            } else if ("update".equals(action)) {
+                user.setId(Integer.parseInt(request.getParameter("id")));
+                userService.updateUser(user);
+            }
+
+            response.sendRedirect("UserServlet"); // Redirect after add/update
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+        String searchQuery = request.getParameter("search"); // Search text
+
+        try {
+            if ("delete".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                userService.deleteUser(id);
+                response.sendRedirect("UserServlet");
+            } else {
+                List<UserModel> users = userService.getAllUsers();
+
+                // Search filtering
+                if(searchQuery != null && !searchQuery.trim().isEmpty()) {
+                    List<UserModel> filteredUsers = new ArrayList<>();
+                    for(UserModel u : users) {
+                        if(u.getUsername().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                           u.getPhone().contains(searchQuery) ||
+                           u.getMail().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                           u.getAddress().toLowerCase().contains(searchQuery.toLowerCase()) ||
+                           u.getStatus().toLowerCase().contains(searchQuery.toLowerCase()))
+                        {
+                            filteredUsers.add(u);
+                        }
+                    }
+                    users = filteredUsers;
                 }
 
-                List<UserModel> userList = getAllUsers((page - 1) * recordsPerPage, recordsPerPage);
-                int totalUsers = getUserCount();
-                int totalPages = (int) Math.ceil(totalUsers * 1.0 / recordsPerPage);
+                request.setAttribute("users", users);
+                request.setAttribute("totalUsers", users.size());
+                request.setAttribute("currentPage", 1);
+                request.setAttribute("totalPages", 1);
 
-                request.setAttribute("users", userList);
-                request.setAttribute("currentPage", page);
-                request.setAttribute("totalPages", totalPages);
-                request.setAttribute("totalUsers", totalUsers);
-            }
-
-            request.getRequestDispatcher("/views/users.jsp").forward(request, response);
-//            List<UserModel> userList= getAllUsers();
-//            request.setAttribute("users", userList);
-//            request.getRequestDispatcher("/views/users.jsp").forward(request, response);
-        }
-    }
-    
-    private void addUser(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
-        try
-        {
-            Connection connection = DBConnection.getConnection();
-            System.out.println("✅ Connection successful");
-            String query = "insert into tbluser(username,password,phone,email,status,role,address)values(?,?,?,?,?,?,?)";
-            PreparedStatement pst = connection.prepareStatement(query);
-            
-            pst.setString(1, request.getParameter("username"));
-            pst.setString(2, request.getParameter("password"));
-            pst.setString(3, request.getParameter("phone"));
-            pst.setString(4, request.getParameter("email"));
-            pst.setString(5, request.getParameter("status"));
-            pst.setString(6, request.getParameter("role"));
-            pst.setString(7, request.getParameter("address"));
-            
-            int rowInserted = pst.executeUpdate();
-
-            if (rowInserted > 0) {
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("window.parent.location.reload();");
-                out.println("alert('✅ User added successfully!');");
-
-                out.println("window.parent.closeAddUserPopup();");
-                out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
-                out.println("</script>");
-            } else {
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("alert('❌ Failed to add user');");
-                out.println("window.history.back();");
-                out.println("</script>");
-            }
-
-//            if (rowInserted > 0) {
-//                System.out.println("User inserted successfully.");
-//            } else {
-//                System.out.println("User NOT inserted.");
-//            }
-       
-//            response.sendRedirect(request.getContextPath() + "/views/users.jsp");
-            
-        }
-        catch(Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-    
-    
-    private void updateUser(HttpServletRequest request, HttpServletResponse response)
-            throws IOException
-    {
-        try
-        {
-            Connection connection = DBConnection.getConnection();
-            String query = "Update tbluser set username =? ,"
-                    + " password=?, phone=?,email=?, status=?,role=?, address=? where id =?";
-            
-            PreparedStatement pst = connection.prepareStatement(query);
-            pst.setString(1, request.getParameter("username"));
-            pst.setString(2, request.getParameter("password"));
-            pst.setString(3, request.getParameter("phone"));
-            pst.setString(4, request.getParameter("email"));
-            pst.setString(5, request.getParameter("status"));
-            pst.setString(6, request.getParameter("role"));
-            pst.setString(7, request.getParameter("address"));
-            pst.setInt(8, Integer.parseInt(request.getParameter("id")));
-            
-            int success = pst.executeUpdate();
-            if (success > 0) {
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("window.parent.location.reload();");
-                out.println("alert('✅ User updated successfully!');");
-
-                out.println("window.parent.closeAddUserPopup();");
-                out.println("window.parent.document.getElementById('contentFrame').src = window.parent.document.getElementById('contentFrame').src;");
-                out.println("</script>");
-            } else {
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("alert('❌ Failed to update user');");
-                out.println("window.history.back();");
-                out.println("</script>");
-            }
-        }
-        catch(Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-    
-    private void deleteUser(HttpServletRequest request, HttpServletResponse response)
-            throws IOException
-    {
-        try
-        {
-            Connection connection = DBConnection.getConnection();
-            String query = "delete from tbluser where id =?";
-            
-            PreparedStatement pst = connection.prepareStatement(query);
-            pst.setInt(1, Integer.parseInt(request.getParameter("id")));
-            
-//              int success = pst.executeUpdate();
-//        if (success > 0) {
-//            request.getSession().setAttribute("deleteMsg", "✅ User deleted successfully!");
-//        } else {
-//            request.getSession().setAttribute("deleteMsg", "❌ Failed to delete user.");
-//        }
-//                response.sendRedirect("views/users.jsp"); // redirect to JSP
-
-            int success = pst.executeUpdate();
-            if(success>0)
-            {
-                response.setContentType("text/html");
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("window.parent.location.reload();");
-                out.println("alert('✅ User deleted successfully!');");
-                out.println("</script>");
-            }
-        }
-        catch(Exception ex)
-        {
-            ex.printStackTrace();  
-            
-        }
-    }
-    
-    
-    
-//    private List<UserModel> getAllUsers()
-//    {
-//        List<UserModel> Users = new ArrayList<>();
-//        
-//        try
-//        {
-//            Connection connection = DBConnection.getConnection();
-//            String query = "select * from tbluser";
-//            
-//            PreparedStatement pst = connection.prepareStatement(query);
-//            ResultSet result = pst.executeQuery();
-//            while(result.next())
-//            {
-//                UserModel user= new UserModel();
-//                
-//                user.setId(result.getInt("id"));
-//                user.setUsername(result.getString("username"));
-//                user.setPassword(result.getString("password"));
-//                user.setPhone(result.getString("phone"));
-//                user.setMail(result.getString("email"));
-//                user.setStatus(result.getString("status"));
-//                user.setRole(result.getString("role"));
-//                user.setAddress(result.getString("address"));
-//                
-//                Users.add(user);
-//            }
-//        }
-//        catch(Exception ex)
-//        {
-//            ex.getStackTrace();
-//        }
-//        return Users;
-//    }
-//    
-//    
-    
-    private List<UserModel> getAllUsers(int offset, int noOfRecords) {
-        List<UserModel> Users = new ArrayList<>();
-
-        try {
-            Connection connection = DBConnection.getConnection();
-            String query = "SELECT * FROM tbluser LIMIT ?, ?";
-            PreparedStatement pst = connection.prepareStatement(query);
-            pst.setInt(1, offset);
-            pst.setInt(2, noOfRecords);
-            ResultSet result = pst.executeQuery();
-
-            while (result.next()) {
-                UserModel user = new UserModel();
-                user.setId(result.getInt("id"));
-                user.setUsername(result.getString("username"));
-                user.setPassword(result.getString("password"));
-                user.setPhone(result.getString("phone"));
-                user.setMail(result.getString("email"));
-                user.setStatus(result.getString("status"));
-                user.setRole(result.getString("role"));
-                user.setAddress(result.getString("address"));
-                Users.add(user);
+                request.getRequestDispatcher("/views/users.jsp").forward(request, response);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        return Users;
     }
-
-    
-    private int getUserCount() {
-        int count = 0;
-        try {
-            Connection connection = DBConnection.getConnection();
-            String query = "SELECT COUNT(*) FROM tbluser";
-            PreparedStatement pst = connection.prepareStatement(query);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
-    
-    private List<UserModel> searchUsers(String keyword) {
-    List<UserModel> Users = new ArrayList<>();
-
-        try {
-            Connection connection = DBConnection.getConnection();
-            String query = "SELECT * FROM tbluser WHERE username LIKE "
-                    + "? OR phone LIKE ? OR email LIKE ? OR role LIKE ? OR address LIKE ? OR status LIKE ?";
-            PreparedStatement pst = connection.prepareStatement(query);
-            String searchValue = "%" + keyword + "%";
-            pst.setString(1, searchValue);
-            pst.setString(2, searchValue);
-            pst.setString(3, searchValue);
-            pst.setString(4, searchValue);
-            pst.setString(5, searchValue);
-            pst.setString(6, searchValue);
-            
-            ResultSet result = pst.executeQuery();
-            while (result.next()) {
-                UserModel user = new UserModel();
-                user.setId(result.getInt("id"));
-                user.setUsername(result.getString("username"));
-                user.setPassword(result.getString("password"));
-                user.setPhone(result.getString("phone"));
-                user.setMail(result.getString("email"));
-                user.setStatus(result.getString("status"));
-                user.setRole(result.getString("role"));
-                user.setAddress(result.getString("address"));
-                Users.add(user);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return Users;
-    }
-
 }
+

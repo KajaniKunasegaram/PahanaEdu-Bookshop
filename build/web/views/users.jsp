@@ -54,64 +54,51 @@
 
 <div class="page-container">
     <div class="table-section">
+        <% List<UserModel> users = (List<UserModel>) request.getAttribute("users"); %>
         <table>
             <thead>
-            <tr>
-                <th>Username</th>
-                <th>Password</th>
-                <th>Phone No</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Address</th>
-                <th>Status</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
+                <tr>
+                    <th>Username</th><th>Password</th><th>Phone</th><th>Email</th><th>Role</th><th>Address</th><th>Status</th><th>Edit</th><th>Delete</th>
+                </tr>
             </thead>
             <tbody id="userTableBody">
-            <%
-                List<UserModel> users = (List<UserModel>) request.getAttribute("users");
-                if (users != null && !users.isEmpty()) {
-                    for (UserModel user : users) {
-            %>
-            <tr>
-                <td><%= user.getUsername() %></td>
-                <td><%= user.getPassword() %></td>
-                <td><%= user.getPhone() %></td>
-                <td><%= user.getMail() %></td>
-                <td><%= user.getRole() %></td>
-                <td><%= user.getAddress() %></td>
-                <td><%= user.getStatus() %></td>
-                <td class="actions">
-                    <button class="edit"
-                            onclick="openEditUserPopup(<%= user.getId() %>,
-                                    '<%= user.getUsername() %>',
-                                    '<%= user.getPhone() %>',
-                                    '<%= user.getStatus() %>',
-                                    '<%= user.getPassword() %>',
-                                    '<%= user.getMail() %>',
-                                    '<%= user.getRole() %>',
-                                    '<%= user.getAddress() %>')">Edit</button>
-                </td>
-                <td class="actions">
-                    <button class="delete" onclick="openDeleteUserPopup(<%= user.getId() %>)">Delete</button>
-                </td>
-            </tr>
-            <%
-                    }
-                } else {
-            %>
-            <tr>
-                <td colspan="9" style="text-align: center; color: crimson; font-size: 20px; font-weight: bold;">
-                    <i class="fas fa-exclamation-triangle" style="color: crimson; margin-right: 8px;"></i>
-                    No user found.
-                </td>
-            </tr>
-            <%
-                }
-            %>
+                <%
+                    if(users != null && !users.isEmpty()) {
+                        for(UserModel u: users) {
+                %>
+                <tr>
+                    <td><%= u.getUsername() %></td>
+                    <td><%= u.getPassword() %></td>
+                    <td><%= u.getPhone() %></td>
+                    <td><%= u.getMail() %></td>
+                    <td><%= u.getRole() %></td>
+                    <td><%= u.getAddress() %></td>
+                    <td><%= u.getStatus() %></td>
+                    <td class="actions"><button class="edit" onclick="openEditUserPopup(<%=u.getId()%>,
+                                 '<%= u.getUsername() %>',
+                                    '<%= u.getPhone() %>',
+                                    '<%= u.getStatus() %>',
+                                    '<%= u.getPassword() %>',
+                                    '<%= u.getMail() %>',
+                                    '<%= u.getRole() %>',
+                                    '<%= u.getAddress() %>')">Edit</button></td>
+                    <td class="actions"><button class="delete" onclick="openDeleteUserPopup(<%=u.getId()%>)">Delete</button></td>
+                </tr>
+                <%
+                        }
+                    } else {
+                %>
+                <tr>
+                    <td colspan="9" style="text-align: center; color: crimson; font-size: 20px; font-weight: bold;">
+                        <i class="fas fa-exclamation-triangle" style="color: crimson; margin-right: 8px;"></i>
+                        No user found.
+                    </td>
+                </tr>
+                <% } %>
             </tbody>
         </table>
+
+    
     </div>
 
     <!-- Pagination (always shown) -->

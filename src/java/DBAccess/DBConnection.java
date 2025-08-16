@@ -14,25 +14,29 @@ import java.sql.SQLException;
 public class DBConnection {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/bookshop";
     private static final String DB_USERNAME = "root";
-    private static final String DB_Password = "";
+    private static final String DB_PASSWORD = "";
     
-    static
+    private static DBConnection instance;
+    
+    private Connection connection;
+    
+    private DBConnection() throws SQLException
     {
-       try
-        {
+         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-        }
-        catch(ClassNotFoundException ex)
-        {
-            System.out.println("Mysql jdbc driver not found.");
-            ex.printStackTrace();
-        } 
+            this.connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("MySQL JDBC Driver not found.", e);
+        }        
     }
-    
-    
-    public static Connection getConnection()
-            throws SQLException
-    {
-        return DriverManager.getConnection(DB_URL,DB_USERNAME,DB_Password);
+   
+    public static DBConnection getInstance() throws SQLException {
+        if (instance == null || instance.getConnection().isClosed()) {
+            instance = new DBConnection();
+        }
+        return instance;
+    }    
+    public Connection getConnection() {
+        return connection;
     }
 }
