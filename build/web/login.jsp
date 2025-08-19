@@ -5,6 +5,12 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<% String error = (String) request.getAttribute("error"); %>
+<% if (error != null) { %>
+<script>
+    alert("<%= error %>");
+</script>
+<% } %>
 <!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
@@ -121,7 +127,8 @@
     <form action="LoginServlet" method="POST">
       <div class="input-field">
         <label for="username">Email or Username</label>
-        <input type="text" id="username" name="username" required>
+        <input type="text" id="username" name="username" required
+       value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>">
       </div>
       
       <div class="input-field">
