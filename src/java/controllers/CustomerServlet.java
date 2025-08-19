@@ -43,7 +43,7 @@ public class CustomerServlet extends HttpServlet
         {
             updateCustomer(request,response);
         }
-        
+       
     }
    
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -119,5 +119,4 @@ public class SalesServlet extends HttpServlet {
 
         return stocks;
     }
-
 }

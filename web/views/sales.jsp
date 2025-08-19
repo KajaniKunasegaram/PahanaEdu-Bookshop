@@ -359,22 +359,25 @@
         function closeCustomerPopup() {
             document.getElementById("customerPopup").style.display = "none";
         }
-
+        
         function confirmPayment() {
             const customerId = document.getElementById("customerSelect").value;
             if (!customerId) {
                 alert("Please select a customer!");
                 return;
             }
-
+                
+            generateBillPDF(customerId);
+        }
+        function generateBillPDF(customerId) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            let y = 15; // starting Y position
+            let y = 15;
             const pageWidth = doc.internal.pageSize.getWidth();
             const logoUrl = "https://cdn-icons-png.flaticon.com/512/29/29302.png";
 
-            // Add smaller centered logo
+            // Logo
             doc.addImage(logoUrl, "PNG", pageWidth / 2 - 10, y, 20, 20);
             y += 30;
 
@@ -385,12 +388,12 @@
 
             // Customer info
             const customerName = document.getElementById("customerSelect").selectedOptions[0].text;
-            const phoneNumber = "123-456-7890"; // Replace with dynamic phone if available
+            const phoneNumber = "123-456-7890";
             doc.setFontSize(12);
             doc.text("Customer: " + customerName, pageWidth / 2, y, { align: "center" });
             y += 7;
             doc.text("Phone: " + phoneNumber, pageWidth / 2, y, { align: "center" });
-            y += 15; // space after header
+            y += 15;
 
             // Column titles
             doc.setFontSize(12);
@@ -402,7 +405,6 @@
 
             // Dotted line under columns
             doc.setLineWidth(0.1);
-            doc.setDrawColor(0);
             doc.line(20, y, 190, y);
             y += 5;
 
@@ -422,16 +424,13 @@
                 y += 5;
             });
 
-            // Grand totals section (labels left, values right)
+            // Totals section
             const grandTotal = billItems.reduce((sum, item) => sum + item.total, 0);
             const payAmount = parseFloat(document.getElementById("payAmount").value) || 0;
             const balanceAmount = parseFloat(document.getElementById("balanceAmount").value) || 0;
-
-            y += 5;
             const labelsX = 20;
             const valuesX = pageWidth - 20;
 
-            doc.setFontSize(12);
             doc.text("Total", labelsX, y);
             doc.text(grandTotal.toFixed(2), valuesX, y, { align: "right" });
             y += 7;
@@ -444,25 +443,20 @@
             doc.text(balanceAmount.toFixed(2), valuesX, y, { align: "right" });
             y += 10;
 
-            let dashXStart = labelsX;
-        let dashXEnd = valuesX;
-        let dashY = y + 2; // slightly below the text
-        let dashLength = 2;
-        for (let i = dashXStart; i < dashXEnd; i += dashLength * 2) {
-            doc.line(i, dashY, i + dashLength, dashY);
-        }
-        y += 15;
+            // Dotted line under totals
+            let dashY = y + 2;
+            let dashLength = 2;
+            for (let i = labelsX; i < valuesX; i += dashLength * 2) {
+                doc.line(i, dashY, i + dashLength, dashY);
+            }
+            y += 15;
 
-
-            // Footer message centered
+            // Footer
             doc.setFontSize(12);
             doc.text("Thank you for choosing us!", pageWidth / 2, y, { align: "center" });
 
-            // Open PDF in new tab
             doc.output("dataurlnewwindow");
         }
-
-
     </script>
 
 
