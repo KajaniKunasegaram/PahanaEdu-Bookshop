@@ -67,10 +67,21 @@ public class BookServlet extends HttpServlet {
             request.setAttribute("categories", categories);
 
             if ("updateForm".equals(action)) {
+
                 int bookId = Integer.parseInt(request.getParameter("id"));
                 BookModel book = getBookById(bookId);
                 request.setAttribute("book", book);
+
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/views/popups/addBook.jsp");
+                dispatcher.forward(request, response);
+                return;
             }
+    
+//            if ("updateForm".equals(action)) {
+//                int bookId = Integer.parseInt(request.getParameter("id"));
+//                BookModel book = getBookById(bookId);
+//                request.setAttribute("book", book);
+//            }
 
             RequestDispatcher dispatcher = request.getRequestDispatcher("/views/popups/addBook.jsp");
             dispatcher.forward(request, response);
@@ -188,7 +199,8 @@ public class BookServlet extends HttpServlet {
     private void updateBook(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         try (Connection connection = DBConnection.getInstance().getConnection()) {
-            String query = "UPDATE tblbook SET title=?, author=?, price=?, category_id=?, image_path=? WHERE id=?";
+        //            String query = "UPDATE tblbook SET title=?, author=?, price=?, category_id=?, image_path=? WHERE id=?";
+            String query = "UPDATE tblbook SET title=?, author=?, price=?, category_id=?, image_path=?, updated_at=NOW() WHERE id=?";
 
             PreparedStatement pst = connection.prepareStatement(query);
 

@@ -4,6 +4,7 @@
  */
 package controllers;
 
+import DAO.CategoryDAO;
 import DBAccess.DBConnection;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,7 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
+import models.CategoryCollection;
 import models.CategoryModel;
+import models.StockModel;
 
 /**
  *
@@ -24,63 +27,97 @@ import models.CategoryModel;
 @WebServlet("/SalesServlet")
 public class SalesServlet extends HttpServlet {
 
-      @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+      protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        // get categories from DB
-        List<CategoryModel> categories = getAllCategories();
+        // Fetch all categories
+        CategoryDAO dao = new CategoryDAO();
+        List<CategoryModel> categories = dao.getAllCategories();
+        CategoryCollection collection = new CategoryCollection(categories);
+        request.setAttribute("categoryCollection", collection);
 
-        // put them in request scope
-        request.setAttribute("categories", categories);
+        // Get category filter from request
+        String categoryIdParam = request.getParameter("categoryId");
+        List<models.StockModel> stockList;
+        if(categoryIdParam == null || categoryIdParam.equals("all")) {
+            // Show all stocks
+            stockList = getAllStock(); // your method to get all stock
+        } else {
+            int categoryId = Integer.parseInt(categoryIdParam);
+            stockList = getStockByCategory(categoryId); // method to get stock by category
+        }
 
-        // forward to sales.jsp
+        request.setAttribute("stockList", stockList);
+
         request.getRequestDispatcher("views/sales.jsp").forward(request, response);
     }
+      
+    private List<models.StockModel> getStockByCategory(int categoryId) {
+        List<models.StockModel> stocks = new ArrayList<>();
+        String query = "SELECT s.id, b.title, c.category_name, s.quantity, s.total_qty, b.price, b.image_path " +
+                       "FROM tblstock s " +
+                       "JOIN tblbook b ON s.book_id = b.id " +
+                       "JOIN tblcategory c ON b.category_id = c.id " +
+                       "WHERE c.id = ? " +
+                       "ORDER BY b.title";
 
-    private List<CategoryModel> getAllCategories() {
-        List<CategoryModel> categories = new ArrayList<>();
-        try (Connection connection = DBConnection.getInstance().getConnection()) {
-            String query = "SELECT id, category_name, description FROM tblcategory ORDER BY id DESC";
-            try (PreparedStatement pst = connection.prepareStatement(query)) {
-                try (ResultSet result = pst.executeQuery()) {
-                    while (result.next()) {
-                        CategoryModel category = new CategoryModel();
-                        category.setId(result.getInt("id"));
-                        category.setName(result.getString("category_name"));
-                        category.setDescription(result.getString("description"));
-                        categories.add(category);
-                    }
+        try (Connection conn = DBAccess.DBConnection.getInstance().getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            pst.setInt(1, categoryId);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while(rs.next()) {
+                    models.StockModel stock = new models.StockModel.Builder()
+                        .setId(rs.getInt("id"))
+                        .setTitle(rs.getString("title"))
+                        .setCategoryName(rs.getString("category_name"))
+                        .setQuantity(rs.getInt("quantity"))
+                        .setTotalQty(rs.getInt("total_qty"))
+                        .setPrice(rs.getDouble("price"))
+                        .setImagePath(rs.getString("image_path"))
+                        .build();
+                    stocks.add(stock);
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return categories;
+
+        return stocks;
     }
+    
+    private List<models.StockModel> getAllStock() {
+        List<models.StockModel> stocks = new ArrayList<>();
+        String query = "SELECT s.id, b.title, c.category_name, s.quantity, s.total_qty, b.price, b.image_path " +
+                       "FROM tblstock s " +
+                       "JOIN tblbook b ON s.book_id = b.id " +
+                       "JOIN tblcategory c ON b.category_id = c.id " +
+                       "ORDER BY b.title";
+
+        try (Connection conn = DBAccess.DBConnection.getInstance().getConnection();
+             PreparedStatement pst = conn.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+            while(rs.next()) {
+                models.StockModel stock = new models.StockModel.Builder()
+                    .setId(rs.getInt("id"))
+                    .setTitle(rs.getString("title"))
+                    .setCategoryName(rs.getString("category_name"))
+                    .setQuantity(rs.getInt("quantity"))
+                    .setTotalQty(rs.getInt("total_qty"))
+                    .setPrice(rs.getDouble("price"))
+                    .setImagePath(rs.getString("image_path"))
+                    .build();
+                stocks.add(stock);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return stocks;
+    }
+
 }
-
-//    private void getAllCategories(HttpServletRequest request, HttpServletResponse response) 
-//            throws ServletException, IOException {
-//        List<CategoryModel> categories = new ArrayList<>();
-//        try (Connection conn = DBConnection.getConnection()) {
-//            String query = "SELECT id, category_name, description FROM tblcategory ORDER BY category_name";
-//            PreparedStatement ps = conn.prepareStatement(query);
-//            ResultSet rs = ps.executeQuery();
-//
-//            while (rs.next()) {
-//                CategoryModel category = new CategoryModel();
-//                category.setId(rs.getInt("id"));
-//                category.setName(rs.getString("category_name")); // matches JSP ${cat.name}
-//                category.setDescription(rs.getString("description"));
-//                categories.add(category);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        request.setAttribute("categories", categories);
-//        request.getRequestDispatcher("sales.jsp").forward(request, response);
-//    }
-
-//}

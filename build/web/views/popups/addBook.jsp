@@ -14,13 +14,12 @@
     String action = request.getParameter("action");
     BookModel book = (BookModel) request.getAttribute("book");
 
-    String id = (book != null) ? String.valueOf(book.getId()) : "";
+   String id = (book != null) ? String.valueOf(book.getId()) : "";
     String title = (book != null) ? book.getTitle() : "";
     String author = (book != null) ? book.getAuthor() : "";
     String price = (book != null) ? String.valueOf(book.getPrice()) : "";
     String category_id = (book != null) ? String.valueOf(book.getCategoryId()) : "";
     String image_path = (book != null) ? book.getImagePath() : "";
-
     boolean isUpdate = "update".equalsIgnoreCase(action);
 
     List<CategoryModel> categories = (List<CategoryModel>) request.getAttribute("categories");

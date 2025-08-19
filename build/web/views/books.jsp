@@ -86,13 +86,8 @@
                 <td><%= book.getCategoryName() %></td>
                 <td>₹<%= book.getPrice() %></td>
                 <td class="actions">
-                    <button class="edit"
-                            onclick="openEditBookPopup(<%= book.getId() %>, 
-                                '<%= book.getTitle() %>',
-                                '<%= book.getAuthor() %>',    
-                                '<%= book.getPrice() %>',
-                                '<%= book.getCategoryName() %>',
-                                '<%= book.getImagePath() %>')">Edit</button>
+<button class="edit" onclick="openEditBookPopup(<%= book.getId() %>)">Edit</button>
+
                 </td>
                 <td class="actions">
                     <button class="delete" onclick="openDeleteBookPopup(<%= book.getId() %>)">Delete</button>
@@ -188,24 +183,34 @@
         location.reload();
     }
     
-    function openEditBookPopup(id, title, author, price, category_id, image_path) {
-    document.getElementById("popup-title").innerText = "Update Book";
+    function openEditBookPopup(id) {
+        document.getElementById("popup-title").innerText = "Update Book";
+        document.getElementById("popup-frame").src = "BookServlet?action=updateForm&id=" + id;
+        document.getElementById("addBookPopup").style.display = "flex";
+    }
+
     
-    const params = new URLSearchParams({
-        action: "updateForm",
-        id: id,
-        title: title,
-        author: author,
-        price: price,
-        category_id: category_id,
-        image_path: image_path
-    });
-        document.getElementById("popup-frame").src = "BookServlet?action=addForm";
+//    function openEditBookPopup(id, title, author, price, category_id, image_path) {
+//    document.getElementById("popup-title").innerText = "Update Book";
+//    
+//    const params = new URLSearchParams({
+//        action: "updateForm",
+//        id: id,
+//        title: title,
+//        author: author,
+//        price: price,
+//        category_id: category_id,
+//        image_path: image_path
+//    });
+//        document.getElementById("popup-frame").src = "BookServlet?action=addForm";
+//
+//
+////    document.getElementById("popup-frame").src = "views/popups/addBook.jsp?" + params.toString();
+//    document.getElementById("addBookPopup").style.display = "flex";
+//}
 
 
-//    document.getElementById("popup-frame").src = "views/popups/addBook.jsp?" + params.toString();
-    document.getElementById("addBookPopup").style.display = "flex";
-}
+
 //
 //    function openEditBookPopup(id, title, author, price, category_id, image_path) {
 //        document.getElementById("popup-title").innerText = "Update Book";

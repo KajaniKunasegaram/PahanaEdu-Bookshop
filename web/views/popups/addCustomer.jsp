@@ -61,7 +61,7 @@
             <!--</div>-->
 
         </div>
-    <div class="add-actions" style="margin-right: 10px;">
+        <div class="add-actions" style="margin-right: 10px;">
             <button type="submit" class="btn-save">Save</button>
             <button type="button" class="btn-cancel" onclick="parent.closeAddCustomerPopup()">Cancel</button>
         </div>

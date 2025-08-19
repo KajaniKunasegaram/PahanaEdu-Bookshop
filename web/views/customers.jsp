@@ -64,6 +64,7 @@
                   <th>Name</th>
                   <th>Address</th>
                   <th>Phone</th>
+                  <th>Unit Consumed</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
@@ -80,6 +81,7 @@
                     <td><%= customer.getName() %></td>
                     <td><%= customer.getAddress() %></td>
                     <td><%= customer.getPhone() %></td>
+                    <td><%= customer.getUnits() %></td>
                     <td class="actions">
                         <button class="edit"
                                 onclick="openEditCustomerPopup(<%= customer.getId() %>,

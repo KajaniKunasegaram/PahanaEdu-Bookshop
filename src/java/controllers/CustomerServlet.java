@@ -50,6 +50,12 @@ public class CustomerServlet extends HttpServlet
             throws ServletException, IOException
     {
         String action = request.getParameter("action");
+            if("getAll".equals(action)) {
+            getAllCustomersJSON(response);
+            return;
+        }
+
+        
         if("delete".equals(action))
         {
             deleteCustomer(request,response);
@@ -126,6 +132,25 @@ public class CustomerServlet extends HttpServlet
         {
             ex.printStackTrace();
         }
+    }
+    
+    private void getAllCustomersJSON(HttpServletResponse response) throws IOException {
+        List<CustomerModel> customers = getAllCustomers(0, 1000); // fetch all
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        StringBuilder sb = new StringBuilder("[");
+        for(int i=0; i<customers.size(); i++){
+            CustomerModel c = customers.get(i);
+            sb.append("{")
+              .append("\"id\":").append(c.getId()).append(",")
+              .append("\"name\":\"").append(c.getName()).append("\",")
+              .append("\"phone\":\"").append(c.getPhone()).append("\"")
+              .append("}");
+            if(i != customers.size()-1) sb.append(",");
+        }
+        sb.append("]");
+        response.getWriter().write(sb.toString());
     }
     
     
@@ -217,6 +242,7 @@ public class CustomerServlet extends HttpServlet
                 customer.setName(result.getString("name"));
                 customer.setPhone(result.getString("phone"));
                 customer.setAddress(result.getString("address"));
+                customer.setUnits(result.getInt("units_consumed"));
                 Customers.add(customer);
             }
         } catch (Exception ex) {
