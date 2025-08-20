@@ -84,7 +84,8 @@
                 <td><%= book.getTitle() %></td>
                 <td><%= book.getAuthor() %></td>
                 <td><%= book.getCategoryName() %></td>
-                <td>₹<%= book.getPrice() %></td>
+                <td><%= String.format("%.2f", book.getPrice()) %></td>
+
                 <td class="actions">
 <button class="edit" onclick="openEditBookPopup(<%= book.getId() %>)">Edit</button>
 

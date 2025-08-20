@@ -58,9 +58,9 @@
            <i class="fas fa-users-cog"></i> Users
          </button>
            
-         <button class="nav-btn" onclick="loadPage(this, 'reports.jsp')">
+<!--         <button class="nav-btn" onclick="loadPage(this, 'reports.jsp')">
            <i class="fas fa-chart-line"></i> Reports
-         </button>
+         </button>-->
            
          <button class="nav-btn" onclick="loadPage(this, 'help.jsp')">
            <i class="fas fa-question-circle"></i> Help
