@@ -7,6 +7,10 @@
             <file>file:/E:/PahanaEdu/Bookshop/web/views/home.jsp</file>
             <file>file:/E:/PahanaEdu/Bookshop/src/java/controllers/LogoutServlet.java</file>
             <file>file:/E:/PahanaEdu/Bookshop/web/login.jsp</file>
+            <file>file:/E:/PahanaEdu/Bookshop/src/java/controllers/CategoryServlet.java</file>
+            <file>file:/E:/PahanaEdu/Bookshop/src/java/DBAccess/DBConnection.java</file>
+            <file>file:/E:/PahanaEdu/Bookshop/web/views/books.jsp</file>
+            <file>file:/E:/PahanaEdu/Bookshop/web/views/help.jsp</file>
         </group>
     </open-files>
 </project-private>

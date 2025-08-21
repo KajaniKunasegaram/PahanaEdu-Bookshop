@@ -10,10 +10,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author HP
- */
 public class UserService {
     // Add User
     public void addUser(UserModel user) throws SQLException {

@@ -7,10 +7,6 @@ package models;
 import Interface.ICategoryIterator;
 import java.util.List;
 
-/**
- *
- * @author HP
- */
 public class CategoryIterator implements ICategoryIterator {
     private List<CategoryModel> categories;
     private int position = 0;

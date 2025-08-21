@@ -7,10 +7,6 @@ package handlers;
 import jakarta.servlet.http.HttpServletRequest;
 import models.UserModel;
 
-/**
- *
- * @author HP
- */
 public class UsernameHandler extends LoginHandler {
     @Override
     public boolean handle(UserModel user, HttpServletRequest request) {

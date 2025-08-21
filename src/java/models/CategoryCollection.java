@@ -6,10 +6,6 @@ package models;
 
 import java.util.List;
 
-/**
- *
- * @author HP
- */
 public class CategoryCollection {
     private List<CategoryModel> categories;
 

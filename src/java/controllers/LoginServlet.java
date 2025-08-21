@@ -32,7 +32,6 @@ public class LoginServlet extends HttpServlet {
 
         UserDAO dao = new UserDAO();
         UserModel user = dao.getUserByUsernameOrEmail(username);
-
         // Setup chain
         LoginHandler usernameHandler = new UsernameHandler();
         LoginHandler passwordHandler = new PasswordHandler(password);
@@ -46,8 +45,6 @@ public class LoginServlet extends HttpServlet {
             response.sendRedirect("views/home.jsp");
         } else {
                 request.setAttribute("error", "Invalid username or password");
-
-//            request.setAttribute("error", request.getAttribute("errorMsg"));
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }

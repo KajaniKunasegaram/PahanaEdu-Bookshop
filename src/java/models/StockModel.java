@@ -18,7 +18,6 @@ public class StockModel {
     private String image_path;
 
     
-    // ✅ Private constructor for Builder
     private StockModel(Builder builder) {
         this.id = builder.id;
         this.title = builder.title;
@@ -29,7 +28,6 @@ public class StockModel {
         this.image_path = builder.image_path;
     }
 
-    // ✅ Builder class
     public static class Builder {
         private int id;
         private String title;
@@ -73,7 +71,6 @@ public class StockModel {
         }
     }
 
-    // ✅ Getters (don’t remove – JSP depends on these)
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getCategoryName() { return category_name; }

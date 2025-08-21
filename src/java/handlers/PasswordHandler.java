@@ -7,10 +7,6 @@ package handlers;
 import jakarta.servlet.http.HttpServletRequest;
 import models.UserModel;
 
-/**
- *
- * @author HP
- */
 public class PasswordHandler extends LoginHandler {
     private String inputPassword;
 
